@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  rdp-client:
+    build:
+      context: ./       
+      args:
+        VITE_SIGNAL_URL: "${VITE_SIGNAL_URL:-ws://localhost:4000}"
+    image: image.rdp-client
+    container_name: container.rdp-client
+    ports:
+      - "${CLIENT_PORT:-3000}:3000"   
+    restart: unless-stopped
+    networks:
+      - rdp-client-network
+
+networks:
+  rdp-client-network:
+    name: rdp-client-network
+    driver: bridge
