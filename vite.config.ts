@@ -12,6 +12,7 @@ export default defineConfig({
   preview: {
     port: 3000,
     open: true,
+    allowedHosts: true,
   },
   build: {
     outDir: 'dist',
