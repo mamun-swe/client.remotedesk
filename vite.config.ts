@@ -10,10 +10,6 @@ export default defineConfig({
     open: true,
     allowedHosts: true,
   },
-  preview: {
-    port: 3000,
-    allowedHosts: ['screening.visionarytechsolution.com'],
-  },
   build: {
     outDir: 'dist',
   },
@@ -21,5 +17,10 @@ export default defineConfig({
     alias: {
       src: '/src',
     },
+  },
+  preview: {
+    allowedHosts: ['screening.visionarytechsolution.com'],
+    host: true,
+    port: 3000,
   },
 });
