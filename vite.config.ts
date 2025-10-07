@@ -19,8 +19,6 @@ export default defineConfig({
     },
   },
   preview: {
-    allowedHosts: ['screening.visionarytechsolution.com'],
-    host: true,
     port: 3000,
   },
 });
