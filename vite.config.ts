@@ -6,19 +6,15 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: '0.0.0.0', // More explicit than 'true'
+    host: '0.0.0.0', // Important for Docker!
     port: 3000,
-    open: true,
-    strictPort: true,
-    hmr: {
-      host: 'screening.visionarytechsolution.com',
+    watch: {
+      usePolling: true, // For file changes in Docker
     },
   },
   preview: {
     host: '0.0.0.0',
     port: 3000,
-    open: true,
-    strictPort: true,
   },
   build: {
     outDir: 'dist',
