@@ -17,6 +17,7 @@ export default defineConfig({
     host: '0.0.0.0', // Must match your CMD --host flag
     port: 3000, // Must match your CMD --port flag
     strictPort: true,
+    allowedHosts: true
   },
   build: {
     outDir: 'dist',
