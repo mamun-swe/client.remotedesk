@@ -15,6 +15,11 @@ export default defineConfig({
   preview: {
     host: '0.0.0.0',
     port: 3000,
+    allowedHosts: [
+      'localhost',
+      'host.docker.internal',
+      'screening.visionarytechsolution.com',
+    ], // Adjust as needed
   },
   build: {
     outDir: 'dist',
