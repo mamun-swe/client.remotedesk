@@ -29,4 +29,4 @@ COPY --from=build /app/dist ./dist
 EXPOSE 3000
 
 # IMPORTANT: bind to 0.0.0.0 and set the port explicitly
-CMD ["vite", "preview", "--host", "0.0.0.0", "--port", "3000", "--strictPort"]
+CMD ["vite", "preview", "--host", "0.0.0.0", "--port", "3000"]
