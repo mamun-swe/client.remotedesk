@@ -6,14 +6,17 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    host: '0.0.0.0',
     port: 3000,
-    open: true,
+    open: false,
+    watch: {
+      usePolling: true,
+    },
   },
   preview: {
-    host: true,
-    port: 3000,
-    open: true,
-    allowedHosts: true,
+    host: '0.0.0.0', // Must match your CMD --host flag
+    port: 3000, // Must match your CMD --port flag
+    strictPort: true,
   },
   build: {
     outDir: 'dist',
