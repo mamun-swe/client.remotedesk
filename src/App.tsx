@@ -8,24 +8,77 @@ const WS_URL =
 
 function useWebSocket(roomId: string, onSignal: (data: any) => void) {
   const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(WS_URL);
-    wsRef.current = ws;
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ type: 'join', roomId }));
-    };
-    ws.onmessage = (ev) => {
+    let isActive = true;
+    let ws: WebSocket;
+
+    const connect = () => {
       try {
-        onSignal(JSON.parse(ev.data));
-      } catch {
-        /* ignore */
+        ws = new WebSocket(WS_URL);
+        wsRef.current = ws;
+
+        ws.onopen = () => {
+          if (isActive) {
+            console.log('WebSocket connected');
+            ws.send(JSON.stringify({ type: 'join', roomId }));
+          }
+        };
+
+        ws.onmessage = (ev) => {
+          if (!isActive) return;
+          try {
+            onSignal(JSON.parse(ev.data));
+          } catch (e) {
+            console.error('Failed to parse message:', e);
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = (event) => {
+          console.log('WebSocket closed:', event.code, event.reason);
+          wsRef.current = null;
+
+          // Optional: Auto-reconnect
+          if (isActive && event.code !== 1000) {
+            reconnectTimeoutRef.current = window.setTimeout(() => {
+              if (isActive) connect();
+            }, 2000);
+          }
+        };
+      } catch (error) {
+        console.error('Failed to create WebSocket:', error);
       }
     };
-    return () => ws.close();
+
+    connect();
+
+    return () => {
+      isActive = false;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (
+        ws?.readyState === WebSocket.OPEN ||
+        ws?.readyState === WebSocket.CONNECTING
+      ) {
+        ws.close(1000, 'Component unmounting');
+      }
+    };
   }, [roomId, onSignal]);
 
-  return (msg: any) => wsRef.current?.send(JSON.stringify(msg));
+  return (msg: any) => {
+    const ws = wsRef.current;
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(msg));
+    } else {
+      console.warn('WebSocket not ready. State:', ws?.readyState);
+    }
+  };
 }
 
 export const App: FC = (): JSX.Element => {
@@ -49,20 +102,6 @@ export const App: FC = (): JSX.Element => {
   useEffect(() => {
     location.hash = roomId;
   }, [roomId]);
-
-  // useEffect(() => {
-  //   if (videoRef.current && remoteStream) {
-  //     videoRef.current.srcObject = remoteStream;
-  //     videoRef.current.muted = true;
-  //     const v = videoRef.current;
-  //     const tryPlay = () =>
-  //       v.play().catch(() => {
-  //         /* ignore, user gesture may be needed */
-  //       });
-  //     v.onloadedmetadata = tryPlay;
-  //     tryPlay();
-  //   }
-  // }, [remoteStream]);
 
   const onSignal = (data: any) => {
     if (!session) return;
